@@ -35,7 +35,7 @@ User : postgres
 
 Password : 1234
 
-Database : mycloudapp
+Database : mycrudapp
 
 Tu peux modifier ces valeurs dans le code ou via un fichier .env.
 
@@ -60,7 +60,7 @@ npm run test
 Projet réalisé dans le cadre du module Développement et services Cloud
 
 Équipe : 
-PAPINAUD Laurent
-KOUADIO Kouassi Romaric
-EL ASRI Oumaima
-LAMRABAT Oumaima
+PAPINAUD Laurent,
+KOUADIO Kouassi Romaric,
+EL ASRI Oumaima,
+LAMRABAT Oumaima.
