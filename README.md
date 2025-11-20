@@ -8,17 +8,21 @@ Application backend développée avec NestJS, proposant un CRUD simple sur des i
 📦 Installation
 Cloner le projet :
 
-bash
+
 git clone https://github.com/<ton-compte>/<ton-repo>.git
 cd <ton-repo>
+
+
 Installer les dépendances :
 
-bash
+
 npm install
+
+
 ▶️ Lancer l’application
 En mode développement :
 
-bash
+
 npm run start:dev
 
 
@@ -52,7 +56,6 @@ Swagger est disponible à la racine : 👉 http://localhost:3000
 🧪 Tests
 Lancer les tests unitaires :
 
-bash
 npm run test
 
 👥 Auteurs
