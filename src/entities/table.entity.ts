@@ -3,7 +3,11 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Reservation } from './reservation.entity';
 import { Commande } from './commande.entity';
 
-export type StatutTable = 'libre' | 'occupée' | 'réservée';
+export enum StatutTable {
+  LIBRE = 'libre',
+  OCCUPEE = 'occupée',
+  RESERVEE = 'réservée',
+}
 
 @Entity('tables')
 export class Table {
@@ -15,8 +19,8 @@ export class Table {
 
   @Column({
     type: 'enum',
-    enum: ['libre', 'occupée', 'réservée'],
-    default: 'libre',
+    enum: StatutTable,
+    default: StatutTable.LIBRE,
   })
   statut: StatutTable;
 

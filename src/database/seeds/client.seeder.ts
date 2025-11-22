@@ -4,13 +4,6 @@ import { Client } from '../../entities/client.entity';
 export async function seedClients(dataSource: DataSource): Promise<void> {
   const clientRepository = dataSource.getRepository(Client);
 
-  // Vérifier si des clients existent déjà
-  const existingClients = await clientRepository.count();
-  if (existingClients > 0) {
-    console.log('⏭️  Des clients existent déjà, seed ignoré');
-    return;
-  }
-
   const clients = [
     {
       nom: 'Dupont Jean',

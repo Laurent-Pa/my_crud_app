@@ -8,6 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Commande } from '../entities/commande.entity';
+import { StatutTable } from '../entities/table.entity';
 import { ClientsService } from '../clients/clients.service';
 import { TablesService } from '../tables/tables.service';
 import { PlatsService } from '../plats/plats.service';
@@ -67,7 +68,7 @@ export class CommandesService {
     const saved = await this.commandeRepository.save(nouvelleCommande);
 
     // Mettre à jour le statut de la table à "occupée"
-    await this.tablesService.update(tableId, undefined, 'occupée');
+    await this.tablesService.update(tableId, undefined, StatutTable.OCCUPEE);
 
     return this.findOne(saved.id);
   }
@@ -116,7 +117,7 @@ export class CommandesService {
       where: { tableId: commande.tableId },
     });
     if (autresCommandes.length === 1) {
-      await this.tablesService.update(commande.tableId, undefined, 'libre');
+      await this.tablesService.update(commande.tableId, undefined, StatutTable.LIBRE);
     }
 
     await this.commandeRepository.remove(commande);

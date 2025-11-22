@@ -8,6 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Reservation } from '../entities/reservation.entity';
+import { StatutTable } from '../entities/table.entity';
 import { ClientsService } from '../clients/clients.service';
 import { TablesService } from '../tables/tables.service';
 
@@ -46,7 +47,7 @@ export class ReservationsService {
     const table = await this.tablesService.findOne(tableId);
 
     // Vérifier que la table est libre ou réservée
-    if (table.statut === 'occupée') {
+    if (table.statut === StatutTable.OCCUPEE) {
       throw new Error(`La table #${tableId} est actuellement occupée`);
     }
 
@@ -57,7 +58,7 @@ export class ReservationsService {
     const saved = await this.reservationRepository.save(nouvelleReservation);
 
     // Mettre à jour le statut de la table
-    await this.tablesService.update(tableId, undefined, 'réservée');
+    await this.tablesService.update(tableId, undefined, StatutTable.RESERVEE);
 
     return this.findOne(saved.id);
   }
@@ -76,14 +77,14 @@ export class ReservationsService {
 
     if (tableId !== undefined) {
       await this.tablesService.findOne(reservation.tableId);
-      await this.tablesService.update(reservation.tableId, undefined, 'libre');
+      await this.tablesService.update(reservation.tableId, undefined, StatutTable.LIBRE);
 
       const nouvelleTable = await this.tablesService.findOne(tableId);
-      if (nouvelleTable.statut === 'occupée') {
+      if (nouvelleTable.statut === StatutTable.OCCUPEE) {
         throw new Error(`La table #${tableId} est actuellement occupée`);
       }
       reservation.tableId = tableId;
-      await this.tablesService.update(tableId, undefined, 'réservée');
+      await this.tablesService.update(tableId, undefined, StatutTable.RESERVEE);
     }
 
     await this.reservationRepository.save(reservation);
@@ -94,7 +95,7 @@ export class ReservationsService {
     const reservation = await this.findOne(id);
 
     // Libérer la table
-    await this.tablesService.update(reservation.tableId, undefined, 'libre');
+    await this.tablesService.update(reservation.tableId, undefined, StatutTable.LIBRE);
 
     await this.reservationRepository.remove(reservation);
   }

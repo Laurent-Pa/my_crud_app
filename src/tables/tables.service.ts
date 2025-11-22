@@ -23,7 +23,7 @@ export class TablesService {
 
   async create(
     capacite: number,
-    statut: StatutTable = 'libre',
+    statut: StatutTable = StatutTable.LIBRE,
   ): Promise<Table> {
     const nouvelleTable = this.tableRepository.create({
       capacite,
