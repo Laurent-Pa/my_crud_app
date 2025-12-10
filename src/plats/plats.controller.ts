@@ -9,19 +9,28 @@ import {
   Body,
 } from '@nestjs/common';
 import { PlatsService } from './plats.service';
-import { Plat } from '../entities/plat.entity';
+
+// Local Interface (same as in the service)
+interface Plat {
+  id: number;
+  nom: string;
+  prix: number;
+  description: string;
+  allergenes: string[];
+  vegetarien: boolean;
+}
 
 @Controller('plats')
 export class PlatsController {
   constructor(private readonly platsService: PlatsService) {}
 
   @Get()
-  findAll(): Promise<Plat[]> {
+  findAll(): Plat[] {
     return this.platsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Plat> {
+  findOne(@Param('id') id: string): Plat {
     return this.platsService.findOne(Number(id));
   }
 
@@ -35,7 +44,7 @@ export class PlatsController {
       allergenes: string[];
       vegetarien: boolean;
     },
-  ): Promise<Plat> {
+  ): Plat {
     return this.platsService.create(
       body.nom,
       body.prix,
@@ -56,7 +65,7 @@ export class PlatsController {
       allergenes?: string[];
       vegetarien?: boolean;
     },
-  ): Promise<Plat> {
+  ): Plat {
     return this.platsService.update(
       Number(id),
       body.nom,
@@ -68,8 +77,8 @@ export class PlatsController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    await this.platsService.remove(Number(id));
+  remove(@Param('id') id: string) {
+    this.platsService.remove(Number(id));
     return { message: `Plat #${id} supprimé` };
   }
 }
