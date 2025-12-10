@@ -5,98 +5,110 @@ import {
   Inject,
   forwardRef,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Reservation } from '../entities/reservation.entity';
-import { StatutTable } from '../entities/table.entity';
+import { StatutTable } from '../tables/table.types';
 import { ClientsService } from '../clients/clients.service';
 import { TablesService } from '../tables/tables.service';
+
+// Interface pour typer nos réservations
+interface Reservation {
+  id: number;
+  clientId: number;
+  tableId: number;
+}
 
 @Injectable()
 export class ReservationsService {
   constructor(
-    @InjectRepository(Reservation)
-    private readonly reservationRepository: Repository<Reservation>,
     @Inject(forwardRef(() => ClientsService))
     private readonly clientsService: ClientsService,
     @Inject(forwardRef(() => TablesService))
     private readonly tablesService: TablesService,
   ) {}
 
-  findAll(): Promise<Reservation[]> {
-    return this.reservationRepository.find({
-      relations: ['client', 'table'],
-    });
+  // Données en mémoire
+  private reservations: Reservation[] = [
+    {
+      id: 1,
+      clientId: 1,
+      tableId: 3,
+    },
+  ];
+  private nextId = 2;
+
+  findAll(): Reservation[] {
+    return this.reservations;
   }
 
-  async findOne(id: number): Promise<Reservation> {
-    const reservation = await this.reservationRepository.findOne({
-      where: { id },
-      relations: ['client', 'table'],
-    });
+  findOne(id: number): Reservation {
+    const reservation = this.reservations.find((r) => r.id === id);
     if (!reservation)
       throw new NotFoundException(`Réservation #${id} non trouvée`);
     return reservation;
   }
 
-  async create(clientId: number, tableId: number): Promise<Reservation> {
+  create(clientId: number, tableId: number): Reservation {
     // Vérifier que le client existe
-    await this.clientsService.findOne(clientId);
+    this.clientsService.findOne(clientId);
 
     // Vérifier que la table existe
-    const table = await this.tablesService.findOne(tableId);
+    const table = this.tablesService.findOne(tableId);
 
     // Vérifier que la table est libre ou réservée
     if (table.statut === StatutTable.OCCUPEE) {
       throw new Error(`La table #${tableId} est actuellement occupée`);
     }
 
-    const nouvelleReservation = this.reservationRepository.create({
+    const nouvelleReservation: Reservation = {
+      id: this.nextId++,
       clientId,
       tableId,
-    });
-    const saved = await this.reservationRepository.save(nouvelleReservation);
+    };
+    this.reservations.push(nouvelleReservation);
 
     // Mettre à jour le statut de la table
-    await this.tablesService.update(tableId, undefined, StatutTable.RESERVEE);
+    this.tablesService.update(tableId, undefined, StatutTable.RESERVEE);
 
-    return this.findOne(saved.id);
+    return nouvelleReservation;
   }
 
-  async update(
-    id: number,
-    clientId?: number,
-    tableId?: number,
-  ): Promise<Reservation> {
-    const reservation = await this.findOne(id);
+  update(id: number, clientId?: number, tableId?: number): Reservation {
+    const reservation = this.findOne(id);
 
     if (clientId !== undefined) {
-      await this.clientsService.findOne(clientId);
+      this.clientsService.findOne(clientId);
       reservation.clientId = clientId;
     }
 
     if (tableId !== undefined) {
-      await this.tablesService.findOne(reservation.tableId);
-      await this.tablesService.update(reservation.tableId, undefined, StatutTable.LIBRE);
+      this.tablesService.findOne(reservation.tableId);
+      this.tablesService.update(
+        reservation.tableId,
+        undefined,
+        StatutTable.LIBRE,
+      );
 
-      const nouvelleTable = await this.tablesService.findOne(tableId);
+      const nouvelleTable = this.tablesService.findOne(tableId);
       if (nouvelleTable.statut === StatutTable.OCCUPEE) {
         throw new Error(`La table #${tableId} est actuellement occupée`);
       }
       reservation.tableId = tableId;
-      await this.tablesService.update(tableId, undefined, StatutTable.RESERVEE);
+      this.tablesService.update(tableId, undefined, StatutTable.RESERVEE);
     }
 
-    await this.reservationRepository.save(reservation);
-    return this.findOne(id);
+    return reservation;
   }
 
-  async remove(id: number): Promise<void> {
-    const reservation = await this.findOne(id);
+  remove(id: number): void {
+    const reservation = this.findOne(id);
 
     // Libérer la table
-    await this.tablesService.update(reservation.tableId, undefined, StatutTable.LIBRE);
+    this.tablesService.update(
+      reservation.tableId,
+      undefined,
+      StatutTable.LIBRE,
+    );
 
-    await this.reservationRepository.remove(reservation);
+    const index = this.reservations.findIndex((r) => r.id === id);
+    this.reservations.splice(index, 1);
   }
 }

@@ -5,19 +5,23 @@ import {
   Inject,
   forwardRef,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Commande } from '../entities/commande.entity';
-import { StatutTable } from '../entities/table.entity';
+import { StatutTable } from '../tables/table.types';
 import { ClientsService } from '../clients/clients.service';
 import { TablesService } from '../tables/tables.service';
 import { PlatsService } from '../plats/plats.service';
 
+// Interface pour typer nos commandes
+interface Commande {
+  id: number;
+  tableId: number;
+  clientId: number;
+  platId: number;
+  prixTotal: number;
+}
+
 @Injectable()
 export class CommandesService {
   constructor(
-    @InjectRepository(Commande)
-    private readonly commandeRepository: Repository<Commande>,
     @Inject(forwardRef(() => ClientsService))
     private readonly clientsService: ClientsService,
     @Inject(forwardRef(() => TablesService))
@@ -26,74 +30,82 @@ export class CommandesService {
     private readonly platsService: PlatsService,
   ) {}
 
-  findAll(): Promise<Commande[]> {
-    return this.commandeRepository.find({
-      relations: ['client', 'table', 'plat'],
-    });
+  // Données en mémoire
+  private commandes: Commande[] = [
+    {
+      id: 1,
+      tableId: 2,
+      clientId: 1,
+      platId: 1,
+      prixTotal: 12.5,
+    },
+  ];
+  private nextId = 2;
+
+  findAll(): Commande[] {
+    return this.commandes;
   }
 
-  async findOne(id: number): Promise<Commande> {
-    const commande = await this.commandeRepository.findOne({
-      where: { id },
-      relations: ['client', 'table', 'plat'],
-    });
+  findOne(id: number): Commande {
+    const commande = this.commandes.find((c) => c.id === id);
     if (!commande) throw new NotFoundException(`Commande #${id} non trouvée`);
     return commande;
   }
 
-  async create(
+  create(
     tableId: number,
     clientId: number,
     platId: number,
     prixTotal?: number,
-  ): Promise<Commande> {
+  ): Commande {
     // Vérifier que le client existe
-    await this.clientsService.findOne(clientId);
+    this.clientsService.findOne(clientId);
 
     // Vérifier que la table existe
-    await this.tablesService.findOne(tableId);
+    this.tablesService.findOne(tableId);
 
     // Vérifier que le plat existe et récupérer son prix
-    const plat = await this.platsService.findOne(platId);
+    const plat = this.platsService.findOne(platId);
 
     // Utiliser le prix du plat si prixTotal n'est pas fourni
     const prix = prixTotal || Number(plat.prix);
 
-    const nouvelleCommande = this.commandeRepository.create({
+    const nouvelleCommande: Commande = {
+      id: this.nextId++,
       tableId,
       clientId,
       platId,
       prixTotal: prix,
-    });
-    const saved = await this.commandeRepository.save(nouvelleCommande);
+    };
+    this.commandes.push(nouvelleCommande);
 
     // Mettre à jour le statut de la table à "occupée"
-    await this.tablesService.update(tableId, undefined, StatutTable.OCCUPEE);
+    this.tablesService.update(tableId, undefined, StatutTable.OCCUPEE);
 
-    return this.findOne(saved.id);
+    return nouvelleCommande;
   }
 
-  async update(
+  update(
     id: number,
     tableId?: number,
     clientId?: number,
     platId?: number,
     prixTotal?: number,
-  ): Promise<Commande> {
-    const commande = await this.findOne(id);
+  ): Commande {
+    const commande = this.findOne(id);
 
     if (clientId !== undefined) {
-      await this.clientsService.findOne(clientId);
+      this.clientsService.findOne(clientId);
       commande.clientId = clientId;
     }
 
     if (tableId !== undefined) {
-      await this.tablesService.findOne(tableId);
+      this.tablesService.findOne(tableId);
       commande.tableId = tableId;
     }
 
     if (platId !== undefined) {
-      const plat = await this.platsService.findOne(platId);
+      const plat = this.platsService.findOne(platId);
       commande.platId = platId;
       // Mettre à jour le prix total si un nouveau plat est sélectionné
       if (prixTotal === undefined) {
@@ -105,21 +117,21 @@ export class CommandesService {
       commande.prixTotal = prixTotal;
     }
 
-    await this.commandeRepository.save(commande);
-    return this.findOne(id);
+    return commande;
   }
 
-  async remove(id: number): Promise<void> {
-    const commande = await this.findOne(id);
+  remove(id: number): void {
+    const commande = this.findOne(id);
 
-    // Libérer la table si c'est la dernière commande
-    const autresCommandes = await this.commandeRepository.find({
-      where: { tableId: commande.tableId },
-    });
-    if (autresCommandes.length === 1) {
-      await this.tablesService.update(commande.tableId, undefined, StatutTable.LIBRE);
+    // Libérer la table si c'est la dernière commande pour cette table
+    const autresCommandes = this.commandes.filter(
+      (c) => c.tableId === commande.tableId && c.id !== id,
+    );
+    if (autresCommandes.length === 0) {
+      this.tablesService.update(commande.tableId, undefined, StatutTable.LIBRE);
     }
 
-    await this.commandeRepository.remove(commande);
+    const index = this.commandes.findIndex((c) => c.id === id);
+    this.commandes.splice(index, 1);
   }
 }

@@ -9,9 +9,20 @@ import {
   Body,
 } from '@nestjs/common';
 import { ReservationsService } from './reservations.service';
-import { Reservation } from '../entities/reservation.entity';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
 
+// Interface locale
+interface Reservation {
+  id: number;
+  clientId: number;
+  tableId: number;
+}
 
 @Controller('reservations')
 @ApiTags('reservations')
@@ -21,7 +32,7 @@ export class ReservationsController {
   @Get()
   @ApiOperation({ summary: 'Liste toutes les réservations' })
   @ApiResponse({ status: 200, description: 'Liste des réservations' })
-  findAll(): Promise<Reservation[]> {
+  findAll(): Reservation[] {
     return this.reservationsService.findAll();
   }
 
@@ -30,7 +41,7 @@ export class ReservationsController {
   @ApiParam({ name: 'id', description: 'ID de la réservation' })
   @ApiResponse({ status: 200, description: 'Réservation trouvée' })
   @ApiResponse({ status: 404, description: 'Réservation non trouvée' })
-  findOne(@Param('id') id: string): Promise<Reservation> {
+  findOne(@Param('id') id: string): Reservation {
     return this.reservationsService.findOne(Number(id));
   }
 
@@ -53,7 +64,7 @@ export class ReservationsController {
       clientId: number;
       tableId: number;
     },
-  ): Promise<Reservation> {
+  ): Reservation {
     return this.reservationsService.create(body.clientId, body.tableId);
   }
 
@@ -68,7 +79,7 @@ export class ReservationsController {
       clientId?: number;
       tableId?: number;
     },
-  ): Promise<Reservation> {
+  ): Reservation {
     return this.reservationsService.update(
       Number(id),
       body.clientId,
@@ -80,8 +91,8 @@ export class ReservationsController {
   @ApiOperation({ summary: 'Supprime une réservation' })
   @ApiParam({ name: 'id', description: 'ID de la réservation à supprimer' })
   @ApiResponse({ status: 200, description: 'Réservation supprimée avec succès' })
-  async remove(@Param('id') id: string) {
-    await this.reservationsService.remove(Number(id));
+  remove(@Param('id') id: string) {
+    this.reservationsService.remove(Number(id));
     return { message: `Réservation #${id} supprimée` };
   }
 }
