@@ -1,0 +1,28 @@
+# cloudbuild.yaml - Configuration pour Google Cloud Build
+
+steps:
+  # Étape 1 : Construire l'image Docker
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/my-crud-app-lp-2026-repo/my-crud-app:latest'
+      - '.'
+
+  # Étape 2 : Pousser l'image vers Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/my-crud-app-lp-2026-repo/my-crud-app:latest'
+
+# Images à stocker dans Artifact Registry
+images:
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/my-crud-app-lp-2026-repo/my-crud-app:latest'
+
+# Options de build
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
+
+# Timeout du build (10 minutes)
+timeout: '600s'
