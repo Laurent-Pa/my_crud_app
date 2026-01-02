@@ -353,16 +353,16 @@ L'application utilise un **Dockerfile multi-stage** optimisé :
 - Compilation du code TypeScript
 
 ### Stage 2 : Production
-- Image légère basée sur `node:20-alpine3.21`
+- Image légère basée sur `node:20-alpine`
 - Copie uniquement des fichiers nécessaires
 - Taille optimisée de l'image finale (~90 MB)
 
 ---
 
 
-### Déploiement manuel (si nécessaire)
+### Déploiement
 ```bash
-# Build et push vers Artifact Registry
+# Build l'image Docker, push vers Artifact Registry et déploy sur Cloud Run
 gcloud builds submit --config=cloudbuild.yaml .
 ```
 
@@ -416,7 +416,6 @@ Vous pouvez tester tous les endpoints directement depuis l'interface Swagger.
 - ✅ Conteneurisation Docker multi-stage
 - ✅ CI/CD avec GitHub Actions
 - ✅ Déploiement automatique sur Cloud Run via Cloud Build
-- ✅ Correction des vulnérabilités npm (cross-spawn, glob)
 - ⚠️ Tests TypeORM temporairement désactivés
 
 ### v1.0.0 - Version initiale (Décembre 2025)
