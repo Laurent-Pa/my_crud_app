@@ -1,6 +1,60 @@
-# 🍽️ Application CRUD Restaurant
+# 🍽️ My CRUD App - Restaurant Management API
 
 Application de gestion de restaurant développée avec NestJS. Cette application permet de gérer les clients, plats, tables, réservations et commandes avec des données en mémoire (stateless).
+
+## 🎯 Projet
+
+Application développée dans le cadre d'un cours sur les **services cloud** et les pratiques **DevOps modernes**.
+
+### Objectifs pédagogiques
+- ✅ Architecture stateless (données en mémoire)
+- ✅ Conteneurisation avec Docker
+- ✅ CI/CD avec GitHub Actions et Google Cloud Build
+- ✅ Déploiement automatique sur Google Cloud Run
+- ✅ Infrastructure as Code avec substitutions variables
+
+### Contexte
+Ce projet est un **fork d'un projet collaboratif** développé en équipe de 4 personnes. La version actuelle a été adaptée pour répondre aux exigences spécifiques du cours de services cloud, avec une migration de l'architecture database vers une architecture stateless.
+
+---
+
+## 🏗️ Architecture
+
+### Stateless Application
+- **Pas de base de données** : Données stockées en mémoire
+- **Réinitialisation au redémarrage** : Données perdues à chaque déploiement
+- **Cloud-ready** : Conçu pour le déploiement serverless
+
+### Stack technique
+- **Backend** : NestJS (Node.js 20.x + TypeScript)
+- **Conteneurisation** : Docker (multi-stage build)
+- **CI** : GitHub Actions
+- **CD** : Google Cloud Build
+- **Hébergement** : Google Cloud Run
+- **Registry** : Google Artifact Registry
+
+---
+
+## 🚀 Déploiement automatique
+
+### Pipeline CI/CD
+```
+Code push → GitHub
+    ↓
+GitHub Actions (CI)
+    ├─ npm ci
+    ├─ npm run build
+    └─ npm test ✅
+    ↓
+Pull Request mergé dans main
+    ↓
+Google Cloud Build (CD)
+    ├─ Docker build
+    ├─ Push vers Artifact Registry
+    └─ Deploy sur Cloud Run ✅
+    ↓
+Application accessible publiquement
+```
 
 ## 📋 Prérequis
 
@@ -10,11 +64,13 @@ Avant d'installer l'application, assurez-vous d'avoir installé :
 - **npm** (généralement inclus avec Node.js)
 - **Docker** (pour la containerisation) - [Télécharger Docker](https://www.docker.com/get-started)
 
-## 🚀 Installation
+---
+
+## 🔧 Installation et lancement local
 
 ### Étape 1 : Cloner le projet
 ```bash
-git clone <url-du-repo>
+git clone https://github.com/Laurent-Pa/my_crud_app.git
 cd my_crud_app
 ```
 
@@ -25,7 +81,9 @@ npm install
 
 Cette commande installera toutes les dépendances nécessaires listées dans `package.json`.
 
-## 🔧 Lancement de l'application
+---
+
+## 🚀 Lancement de l'application
 
 ### Option A : En local (développement)
 
@@ -47,6 +105,8 @@ Puis lancez-la :
 ```bash
 npm run start:prod
 ```
+
+---
 
 ### Option B : Avec Docker (recommandé)
 
@@ -74,7 +134,7 @@ Vous devriez voir :
 ```json
 {
   "status": "ok",
-  "timestamp": "2025-12-30T...",
+  "timestamp": "2025-01-02T...",
   "service": "restaurant-api"
 }
 ```
@@ -97,12 +157,34 @@ docker rm my-crud-app
 docker rmi my-crud-app:latest
 ```
 
-## 🌿 Workflow Git et Collaboration
+---
 
-- **main** - Branche principale stable
-- Créez une branche pour chaque fonctionnalité : `git checkout -b feature-nom`
-- Faites régulièrement des commits avec une description explicite
-- Faites des pull requests pour merger dans main
+## 🌿 Workflow Git et CI/CD
+
+### Stratégie de branches
+- **main** - Branche principale stable, protégée par les tests automatiques
+- **feat/\*** - Branches de fonctionnalités
+- **fix/\*** - Branches de corrections
+- **docs/\*** - Branches de documentation
+
+### Workflow de développement
+1. Créez une branche pour chaque fonctionnalité : `git checkout -b feat/nom-feature`
+2. Développez et faites des commits réguliers avec des messages explicites
+3. Poussez votre branche : `git push origin feat/nom-feature`
+4. Créez une Pull Request vers `main`
+5. **GitHub Actions lance automatiquement** :
+   - Installation des dépendances
+   - Compilation TypeScript
+   - Tests unitaires
+6. Si les tests passent ✅ → Merge autorisé
+7. Après le merge dans `main` → **Déploiement automatique** sur Cloud Run
+
+### Protection de la branche main
+- ✅ Tests automatiques obligatoires (GitHub Actions)
+- ✅ Déploiement automatique après merge réussi
+- ✅ Historique Git propre avec squash merge
+
+---
 
 ## 📚 Structure de l'application
 
@@ -115,6 +197,8 @@ L'application est organisée en modules NestJS :
 - **Commandes** (`/commandes`) - Gestion des commandes
 
 ⚠️ **Note importante** : L'application utilise des **données en mémoire**. Toutes les données sont réinitialisées à chaque redémarrage de l'application.
+
+---
 
 ## 🔌 Endpoints de l'API
 
@@ -163,6 +247,8 @@ L'application est organisée en modules NestJS :
 - `PUT /commandes/:id` - Modifie une commande
 - `DELETE /commandes/:id` - Supprime une commande
 
+---
+
 ## 📝 Exemple d'utilisation
 
 ### Créer un client
@@ -203,6 +289,8 @@ Content-Type: application/json
 }
 ```
 
+---
+
 ## 🛠️ Scripts disponibles
 
 - `npm run start:dev` - Lance l'application en mode développement (avec watch)
@@ -214,7 +302,11 @@ Content-Type: application/json
 - `npm run test` - Lance les tests unitaires
 - `npm run test:e2e` - Lance les tests end-to-end
 
+---
+
 ## 🧪 Tests
+
+[![CI Tests](https://github.com/Laurent-Pa/my_crud_app/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/Laurent-Pa/my_crud_app/actions/workflows/ci-tests.yml)
 
 L'application inclut des tests unitaires pour certains services.
 
@@ -233,6 +325,11 @@ npm run test:cov
 npm run test:watch
 ```
 
+### Status des tests
+**Note** : Certains tests TypeORM ont été temporairement désactivés suite à la migration vers l'architecture stateless. Les tests passants couvrent les contrôleurs et les services critiques.
+
+---
+
 ## 💾 Stockage des données
 
 L'application utilise un **stockage en mémoire** pour toutes les entités. Les données sont initialisées au démarrage avec quelques exemples et sont **perdues à chaque redémarrage**.
@@ -245,6 +342,8 @@ L'application utilise un **stockage en mémoire** pour toutes les entités. Les 
 - **1 réservation** : Client 1 à la table 3
 - **1 commande** : Table 2, Client 1, Plat 1
 
+---
+
 ## 🐳 Architecture Docker
 
 L'application utilise un **Dockerfile multi-stage** optimisé :
@@ -256,7 +355,18 @@ L'application utilise un **Dockerfile multi-stage** optimisé :
 ### Stage 2 : Production
 - Image légère basée sur `node:20-alpine`
 - Copie uniquement des fichiers nécessaires
-- Taille optimisée de l'image finale
+- Taille optimisée de l'image finale (~90 MB)
+
+---
+
+
+### Déploiement
+```bash
+# Build l'image Docker, push vers Artifact Registry et déploy sur Cloud Run
+gcloud builds submit --config=cloudbuild.yaml .
+```
+
+---
 
 ## ⚠️ Dépannage
 
@@ -285,25 +395,52 @@ docker container prune
 docker image prune
 ```
 
+---
+
 ## 📖 Documentation de l'API
 
 L'application expose une documentation interactive Swagger :
 
-- **Documentation Swagger** : `http://localhost:3000`
+- **Documentation Swagger (local)** : `http://localhost:3000`
 
 Vous pouvez tester tous les endpoints directement depuis l'interface Swagger.
 
-## 🚀 Déploiement
+---
 
-L'application est prête pour être déployée sur une plateformes cloud comme :
-- Google Cloud Run
+## 📝 Changelog
 
-Le Dockerfile inclus permet un déploiement simple et rapide.
+### v2.0.0 - Architecture Cloud-Native (Janvier 2026)
+- ✅ Migration vers architecture stateless
+- ✅ Suppression de PostgreSQL/TypeORM
+- ✅ Données en mémoire
+- ✅ Conteneurisation Docker multi-stage
+- ✅ CI/CD avec GitHub Actions
+- ✅ Déploiement automatique sur Cloud Run via Cloud Build
+- ⚠️ Tests TypeORM temporairement désactivés
+
+### v1.0.0 - Version initiale (Décembre 2025)
+- ✅ CRUD complet avec NestJS
+- ✅ Base de données PostgreSQL
+- ✅ TypeORM pour l'ORM
+- ✅ Développement collaboratif en équipe de 4
+
+---
+
 
 ## 📄 Licence
 
 Ce projet est sous licence MIT.
 
-## 👨‍💻 Auteur
+---
 
-Application développée avec NestJS comme projet d'apprentissage du développement cloud-native.
+## 👥 Contributeurs
+
+### Équipe originale (v1.0.0)
+Projet collaboratif développé en équipe de 4 personnes.
+
+### Adaptation Cloud-Native (v2.0.0)
+**Laurent Pa** - Migration vers architecture cloud et mise en place du CI/CD
+- GitHub : [@Laurent-Pa](https://github.com/Laurent-Pa)
+- Contexte : Cours Services Cloud - EPSI Nantes
+
+---
