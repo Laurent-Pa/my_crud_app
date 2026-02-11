@@ -6,7 +6,7 @@ export async function seedClients(dataSource: DataSource): Promise<void> {
 
   const clients = [
     {
-      nom: 'Dupont Jean',
+      nom: 'KOUADIO Romaric',
       allergies: ['arachides', 'fruits de mer'],
       majeur: true,
       vegetarien: false,
