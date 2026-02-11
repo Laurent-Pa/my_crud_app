@@ -14,7 +14,7 @@ async function bootstrap() {
   
    // Activer CORS
   app.enableCors({
-    origin: ['https://my-crud-app-450184488008.europe-west1.run.app/'], // URL du front
+    origin: ['https://my-crud-app-front-1058342834957.europe-west1.run.app'], // URL du front
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   });
