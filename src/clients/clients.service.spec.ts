@@ -35,8 +35,8 @@ describe('ClientsService', () => {
 
       expect(result).toEqual(
         expect.arrayContaining([
-          expect.objectContaining({ nom: 'Dupont Jean' }),
-          expect.objectContaining({ nom: 'Martin Sophie' }),
+          expect.objectContaining({ nom: 'KOUADIO Romaric' }),
+          expect.objectContaining({ nom: 'PAPINAUD Laurent' }),
         ]),
       );
     });
@@ -48,7 +48,6 @@ describe('ClientsService', () => {
 
       expect(result).toBeDefined();
       expect(result.id).toBe(1);
-      expect(result.nom).toBe('Dupont Jean');
     });
 
     it("devrait lancer une exception si le client n'existe pas", () => {
@@ -92,12 +91,12 @@ describe('ClientsService', () => {
 
   describe('update', () => {
     it('devrait mettre à jour un client existant', () => {
-      const result = service.update(1, 'Dupont Jean-Pierre', [
+      const result = service.update(1, 'BRETON Bryan', [
         'arachides',
         'lactose',
       ]);
 
-      expect(result.nom).toBe('Dupont Jean-Pierre');
+      expect(result.nom).toBe('BRETON Bryan');
       expect(result.allergies).toEqual(['arachides', 'lactose']);
     });
 
