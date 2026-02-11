@@ -16,17 +16,31 @@ export class ClientsService {
   private clients: Client[] = [
     {
       id: 1,
-      nom: 'Dupont Jean',
+      nom: 'KOUADIO Romaric',
       allergies: ['arachides', 'gluten'],
       majeur: true,
       vegetarien: false,
     },
     {
       id: 2,
-      nom: 'Martin Sophie',
+      nom: 'PAPINAUD Laurent',
       allergies: [],
       majeur: true,
       vegetarien: true,
+    },
+    {
+      id: 3,
+      nom: 'LAMRABAT Oumaima',
+      allergies: ['arachides', 'gluten'],
+      majeur: true,
+      vegetarien: false,
+    },
+    {
+      id: 4,
+      nom: 'EL ASRI Oumaima',
+      allergies: ['arachides', 'gluten'],
+      majeur: true,
+      vegetarien: false,
     },
   ];
   private nextId = 3;
