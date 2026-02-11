@@ -11,6 +11,14 @@ async function bootstrap() {
     .setDescription('API de gestion de restaurant')
     .setVersion('1.0')
     .build();
+  
+   // Activer CORS
+  app.enableCors({
+    origin: ['https://my-crud-app-450184488008.europe-west1.run.app/'], // URL du front
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    credentials: true,
+  });
+
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/', app, document); // Disponible sur la route racine
