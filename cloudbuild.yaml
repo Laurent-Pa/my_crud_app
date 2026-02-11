@@ -53,4 +53,4 @@ options:
   machineType: 'E2_HIGHCPU_8'
 
 # Build timeout (10 minutes)
-timeout: '60s'
+timeout: '360s'
