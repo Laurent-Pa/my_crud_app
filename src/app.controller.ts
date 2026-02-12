@@ -12,7 +12,7 @@ export class AppController {
   }
 
   // Route: GET /health (specific to check cloud health)
-  @Get('health')
+  @Get('healthhh')
   getHealth() {
     return {
       status: 'ok',

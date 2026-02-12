@@ -17,7 +17,7 @@ export class PlatsService {
   private plats: Plat[] = [
     {
       id: 1,
-      nom: 'Burger Classique',
+      nom: 'Burger test',
       prix: 12.5,
       description: 'Pain, steak, salade, tomate',
       allergenes: ['gluten'],
