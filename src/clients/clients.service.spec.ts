@@ -13,12 +13,12 @@ describe('ClientsService', () => {
     service = module.get<ClientsService>(ClientsService);
   });
 
-  it('devrait être défini', () => {
+  it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
   describe('findAll', () => {
-    it('devrait retourner un tableau de clients', () => {
+    it('should return an array of clients', () => {
       const result = service.findAll();
 
       expect(result).toBeInstanceOf(Array);
@@ -30,7 +30,7 @@ describe('ClientsService', () => {
       expect(result[0]).toHaveProperty('vegetarien');
     });
 
-    it('devrait contenir les clients par défaut', () => {
+    it('should contain default clients', () => {
       const result = service.findAll();
 
       expect(result).toEqual(
@@ -43,37 +43,37 @@ describe('ClientsService', () => {
   });
 
   describe('findOne', () => {
-    it('devrait retourner un client par son ID', () => {
+    it('should return a client by his ID', () => {
       const result = service.findOne(1);
 
       expect(result).toBeDefined();
       expect(result.id).toBe(1);
     });
 
-    it("devrait lancer une exception si le client n'existe pas", () => {
+    it("should throw NotFoundException if client not found", () => {
       expect(() => service.findOne(999)).toThrow(NotFoundException);
       expect(() => service.findOne(999)).toThrow('Client #999 non trouvé');
     });
   });
 
   describe('create', () => {
-    it('devrait créer un nouveau client', () => {
-      const clientsAvant = service.findAll().length;
+    it('should create a new client', () => {
+      const clientsBefore = service.findAll().length;
 
-      const result = service.create('Nouveau Client', ['gluten'], true, false);
+      const result = service.create('New Client', ['gluten'], true, false);
 
       expect(result).toBeDefined();
       expect(result.id).toBeDefined();
-      expect(result.nom).toBe('Nouveau Client');
+      expect(result.nom).toBe('New Client');
       expect(result.allergies).toEqual(['gluten']);
       expect(result.majeur).toBe(true);
       expect(result.vegetarien).toBe(false);
 
-      const clientsApres = service.findAll().length;
-      expect(clientsApres).toBe(clientsAvant + 1);
+      const clientsAfter = service.findAll().length;
+      expect(clientsAfter).toBe(clientsBefore + 1);
     });
 
-    it('devrait gérer les valeurs par défaut', () => {
+    it('should create default values', () => {
       const result = service.create('Client Simple', [], false, false);
 
       expect(result.allergies).toEqual([]);
@@ -81,7 +81,7 @@ describe('ClientsService', () => {
       expect(result.vegetarien).toBe(false);
     });
 
-    it('devrait auto-incrémenter les IDs', () => {
+    it('should auto-increment IDs', () => {
       const client1 = service.create('Client 1', [], true, false);
       const client2 = service.create('Client 2', [], true, false);
 
@@ -90,8 +90,8 @@ describe('ClientsService', () => {
   });
 
   describe('update', () => {
-    it('devrait mettre à jour un client existant', () => {
-      const result = service.update(1, 'BRETON Bryan', [
+    it('should update an existing client', () => {
+      const result = service.update(1, 'BRETON Bryan', [    // rename the first client
         'arachides',
         'lactose',
       ]);
@@ -117,12 +117,12 @@ describe('ClientsService', () => {
 
   describe('remove', () => {
     it('devrait supprimer un client', () => {
-      const clientsAvant = service.findAll().length;
+      const clientsBefore = service.findAll().length;
 
       service.remove(1);
 
-      const clientsApres = service.findAll().length;
-      expect(clientsApres).toBe(clientsAvant - 1);
+      const clientsAfter = service.findAll().length;
+      expect(clientsAfter).toBe(clientsBefore - 1);
 
       expect(() => service.findOne(1)).toThrow(NotFoundException);
     });
